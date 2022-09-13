@@ -1,1 +1,1 @@
-export { default as AudioRecorder } from './AudioRecorder/AudioRecorder'
+export { default as AudioRecorder } from './containers/AudioRecorder/AudioRecorder'

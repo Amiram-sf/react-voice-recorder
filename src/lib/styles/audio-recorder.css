@@ -1,0 +1,50 @@
+.react-voice-recorder{
+    --p-color: #2498fe;
+    --p-color-hover: #0389ff;
+
+    --s-color: #ffab40;
+    --s-color-hover: #ff9611;
+
+    --d-color: #f24e42;
+
+    --grey-color: #969696;
+    --text-s-color: #2d2d2d;
+}
+
+.react-voice-recorder * {
+    box-sizing: border-box;
+}
+
+.react-voice-recorder {
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 32px auto 85px;
+    column-gap: 1rem;
+}
+
+.react-voice-recorder .play-controls,
+.react-voice-recorder .wave-controls,
+.react-voice-recorder .cancel-recorder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.react-voice-recorder .button {
+    width: 2.3rem;
+    height: 2.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-style: none;
+    padding: 0;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.react-voice-recorder .button.button-send {
+    background-color: var(--p-color);
+    border-radius: 50%;
+    color: white;
+}
