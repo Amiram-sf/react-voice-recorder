@@ -1,4 +1,4 @@
-.react-voice-recorder{
+.react-voice-recorder {
     --p-color: #2498fe;
     --p-color-hover: #0389ff;
 
@@ -21,14 +21,25 @@
     display: grid;
     grid-template-columns: 32px auto 85px;
     column-gap: 1rem;
+    padding: 0.5rem 0;
 }
 
 .react-voice-recorder .play-controls,
 .react-voice-recorder .wave-controls,
-.react-voice-recorder .cancel-recorder {
+.react-voice-recorder .cancel-recorder,
+.react-voice-recorder .wave-controls .recording-progress {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.react-voice-recorder .wave-controls .recording-progress {
+    width: 100%;
+}
+
+
+.react-voice-recorder .wave-controls .recording-progress .timer {
+    margin-right: 1rem;
 }
 
 .react-voice-recorder .button {
@@ -47,4 +58,9 @@
     background-color: var(--p-color);
     border-radius: 50%;
     color: white;
+}
+
+.react-voice-recorder .wave-controls canvas {
+    height: 40px;
+    width: 100%;
 }

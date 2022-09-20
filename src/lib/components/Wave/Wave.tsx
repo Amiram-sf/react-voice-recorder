@@ -1,5 +1,5 @@
 export const Wave = () => {
     return (
-        <p>Wave</p>
+        <canvas id="canvas"></canvas>
     )
 }

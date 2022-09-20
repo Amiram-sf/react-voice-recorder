@@ -1,6 +1,14 @@
-export const Remove = () => {
+import { FC } from "react"
+
+interface IRemove {
+    onClick?: () => void
+}
+
+export const Remove: FC<IRemove> = ({
+    onClick
+}) => {
     return (
-        <button type="button" className="button">
+        <button onClick={onClick} type="button" className="button">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="1.5rem"

@@ -1,12 +1,19 @@
-import { useState } from "react"
+import { FC, useState } from "react"
 import { IsShow } from "../../IsShow/IsShow"
 
+interface ITogglePlay {
+    onClick: () => void
+    isRecordeing: boolean
+}
 
-
-export const TogglePlay = () => {
-    const [isRecordeing, setIsRecordeing] = useState(true)
+export const TogglePlay: FC<ITogglePlay> = ({
+    onClick,
+    isRecordeing
+}) => {
     return (
-        <button type='button' className='button' onClick={() => { setIsRecordeing(!isRecordeing) }}>
+        <button type='button' className='button' onClick={() => {
+            onClick()
+        }}>
             <IsShow isShow={isRecordeing}>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
