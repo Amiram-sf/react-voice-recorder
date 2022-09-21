@@ -16,10 +16,12 @@ export interface IDataAvailable {
 
 interface IAudioRecorder {
     onDataAvailable: (value: IDataAvailable) => void
+    onCancel: () => void
 }
 
 function AudioRecorder({
-    onDataAvailable
+    onDataAvailable,
+    onCancel
 }: IAudioRecorder): ReactElement {
 
     const currentTime = useRef<ITime>({
@@ -107,6 +109,7 @@ function AudioRecorder({
                 mediaRecorder.current?.stop()
                 mediaChunks.current = []
                 setPasue(true)
+                onCancel()
             } catch (e) {
                 console.log(e);
 
