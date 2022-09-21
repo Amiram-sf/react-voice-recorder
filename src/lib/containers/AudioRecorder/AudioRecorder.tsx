@@ -1,23 +1,43 @@
 import { IMedia, MediaCore } from 'media-core';
-import { useEffect, useRef, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { Remove } from '../../components/Buttons/Remove/Remove';
 import { Send } from '../../components/Buttons/Send/Send';
 import { TogglePlay } from '../../components/Buttons/TogglePlay/TogglePlay';
-import RecordingProgress from '../../components/RecordingProgress/RecordingProgress';
+import RecordProgress from '../../components/RecordProgress/RecordProgress';
+import { ITime } from '../../utils/base-models';
 import { mediaSupported } from '../../utils/media';
-import { wave } from '../../utils/waveform';
+import { WaveForm } from '../../utils/waveform';
 import './../../styles/audio-recorder.css';
 
-const AudioRecorder = () => {
+export interface IDataAvailable {
+    value: Blob
+    time: ITime
+}
 
+interface IAudioRecorder {
+    onDataAvailable: (value: IDataAvailable) => void
+}
+
+function AudioRecorder({
+    onDataAvailable
+}: IAudioRecorder): ReactElement {
+
+    const currentTime = useRef<ITime>({
+        minute: 0,
+        seconds: 0
+    })
     const mediaRecorder = useRef<MediaRecorder | null>(null)
     const asd = useRef<string>("")
     const mediaChunks = useRef<Blob[]>([])
+    const waveForm = useRef<{
+        startVisualizer: () => void,
+        stopVisualizer: () => void
+    } | null>(null)
 
     const [pasue, setPasue] = useState(true)
     const [enableTimer, setEnableTimer] = useState(false)
 
-    const onDataAvailable = (data: BlobEvent) => {
+    const onAudioDataAvailable = (data: BlobEvent) => {
         mediaChunks.current.push(data.data)
 
     }
@@ -35,8 +55,9 @@ const AudioRecorder = () => {
             }
 
             mediaRecorder.current = await MediaCore(mediaConfig);
-            wave(mediaRecorder.current.stream).drawVisualizer()
-            mediaRecorder.current.addEventListener('dataavailable', onDataAvailable)
+            waveForm.current = WaveForm.setStream(mediaRecorder.current.stream)
+            waveForm.current.startVisualizer()
+            mediaRecorder.current.addEventListener('dataavailable', onAudioDataAvailable)
             setEnableTimer(true)
             startRecording()
         } catch (e) {
@@ -50,11 +71,10 @@ const AudioRecorder = () => {
         if (asd.current === "sac") return
         asd.current = "sac"
         if (mediaRecorder.current == null) {
-            console.log('hello');
 
             getMediaRecorder()
             return () => {
-                mediaRecorder.current?.removeEventListener('dataavailable', onDataAvailable)
+                mediaRecorder.current?.removeEventListener('dataavailable', onAudioDataAvailable)
             }
         }
     }, [])
@@ -85,6 +105,8 @@ const AudioRecorder = () => {
         ) {
             try {
                 mediaRecorder.current?.stop()
+                mediaChunks.current = []
+                setPasue(true)
             } catch (e) {
                 console.log(e);
 
@@ -100,6 +122,7 @@ const AudioRecorder = () => {
             try {
                 mediaRecorder.current?.pause()
                 setPasue(true)
+                waveForm.current?.stopVisualizer()
             } catch (e) {
                 console.log(e);
 
@@ -108,7 +131,6 @@ const AudioRecorder = () => {
     }
 
     const resumeRecording = () => {
-        console.log('mediaRecorder.current?.state', mediaRecorder.current?.state);
 
         if (
             isValidMediaRecorder() &&
@@ -117,11 +139,24 @@ const AudioRecorder = () => {
             try {
                 mediaRecorder.current?.resume()
                 setPasue(false)
+                waveForm.current?.startVisualizer()
             } catch (e) {
                 console.log(e);
 
             }
         }
+    }
+
+    const updateTime = (value: ITime) => {
+        currentTime.current = value
+    }
+
+    const onSendData = () => {
+        onDataAvailable({
+            time: currentTime.current,
+            value: new Blob(mediaChunks.current, { type: mediaSupported() })
+        })
+        stopRecording()
     }
 
 
@@ -131,9 +166,11 @@ const AudioRecorder = () => {
                 <Remove onClick={() => { stopRecording() }} />
             </div>
             <div className='wave-controls'>
-                <RecordingProgress
+                <RecordProgress
                     enableTimer={enableTimer}
                     pasue={pasue}
+                    voiceFile={mediaChunks.current}
+                    onUpdateTime={updateTime}
                 />
             </div>
             <div className='play-controls'>
@@ -147,7 +184,7 @@ const AudioRecorder = () => {
                         }
                     }}
                 />
-                <Send />
+                <Send onClick={onSendData} />
             </div>
         </div>
     )

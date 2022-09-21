@@ -1,14 +1,23 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
 import { AudioRecorder } from './lib'
+import { IDataAvailable } from './lib/containers/AudioRecorder/AudioRecorder'
 
 function App() {
   const [count, setCount] = useState(0)
 
+  const onDataReady = (value: IDataAvailable) => {
+    console.log(value);
+
+  }
+
   return (
     <div className="App">
-      <AudioRecorder />
+      <div className='voice-recorder'>
+        <AudioRecorder
+          onDataAvailable={onDataReady}
+        />
+      </div>
     </div>
   )
 }

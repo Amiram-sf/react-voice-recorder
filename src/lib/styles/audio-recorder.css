@@ -8,6 +8,7 @@
     --d-color: #f24e42;
 
     --grey-color: #969696;
+    --grey-bg-color: #e1e0e0;
     --text-s-color: #2d2d2d;
 }
 
@@ -24,22 +25,44 @@
     padding: 0.5rem 0;
 }
 
+.react-voice-recorder .actions {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.react-voice-recorder .timer {
+    color: var(--grey-color);
+}
+
 .react-voice-recorder .play-controls,
 .react-voice-recorder .wave-controls,
 .react-voice-recorder .cancel-recorder,
-.react-voice-recorder .wave-controls .recording-progress {
+.react-voice-recorder .wave-controls .recording-progress,
+.react-voice-recorder .wave-controls .play-recorded-voice {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.react-voice-recorder .wave-controls .recording-progress {
+.react-voice-recorder .wave-controls .recording-progress,
+.react-voice-recorder .wave-controls .play-recorded-voice {
     width: 100%;
 }
 
+.react-voice-recorder .wave-controls .play-recorded-voice {
+    background-color: var(--grey-bg-color);
+    border-radius: 100px;
+    padding: 0 1rem;
+}
 
-.react-voice-recorder .wave-controls .recording-progress .timer {
-    margin-right: 1rem;
+.react-voice-recorder .wave-controls .play-recorded-voice #react-voice-recorder-audio {
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .react-voice-recorder .button {
@@ -60,7 +83,8 @@
     color: white;
 }
 
-.react-voice-recorder .wave-controls canvas {
-    height: 40px;
+.react-voice-recorder .wave-controls #react-voice-recorder-canvas {
+    height: 36px;
     width: 100%;
+    margin: 0.2rem 0.5rem;
 }

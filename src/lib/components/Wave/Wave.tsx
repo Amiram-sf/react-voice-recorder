@@ -1,5 +1,5 @@
 export const Wave = () => {
     return (
-        <canvas id="canvas"></canvas>
+        <canvas id="react-voice-recorder-canvas"></canvas>
     )
 }
