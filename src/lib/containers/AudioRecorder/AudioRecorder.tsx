@@ -5,6 +5,7 @@ import { Send } from '../../components/Buttons/Send/Send';
 import { TogglePlay } from '../../components/Buttons/TogglePlay/TogglePlay';
 import RecordProgress from '../../components/RecordProgress/RecordProgress';
 import { ITime } from '../../utils/base-models';
+import { Logger } from '../../utils/logger';
 import { mediaSupported } from '../../utils/media';
 import { WaveForm } from '../../utils/waveform';
 import './../../styles/audio-recorder.css';
@@ -17,11 +18,13 @@ export interface IDataAvailable {
 interface IAudioRecorder {
     onDataAvailable: (value: IDataAvailable) => void
     onCancel: () => void
+    isLogging?: boolean
 }
 
 function AudioRecorder({
     onDataAvailable,
-    onCancel
+    onCancel,
+    isLogging = false
 }: IAudioRecorder): ReactElement {
 
     const currentTime = useRef<ITime>({
@@ -63,8 +66,7 @@ function AudioRecorder({
             setEnableTimer(true)
             startRecording()
         } catch (e) {
-            console.log(e);
-
+            Logger.error(e)
         }
     }
 
@@ -81,6 +83,11 @@ function AudioRecorder({
         }
     }, [])
 
+    useEffect(() => {
+        Logger.isLog = isLogging;
+    }, [isLogging])
+
+
     const isValidMediaRecorder = () => {
         return !!mediaRecorder.current && mediaRecorder.current.stream.active
     }
@@ -94,8 +101,7 @@ function AudioRecorder({
                 mediaRecorder.current.start(1000)
                 setPasue(false)
             } catch (e) {
-                console.log(e);
-
+                Logger.error(e)
             }
         }
     }
@@ -111,8 +117,7 @@ function AudioRecorder({
                 setPasue(true)
                 onCancel()
             } catch (e) {
-                console.log(e);
-
+                Logger.error(e)
             }
         }
     }
@@ -127,8 +132,7 @@ function AudioRecorder({
                 setPasue(true)
                 waveForm.current?.stopVisualizer()
             } catch (e) {
-                console.log(e);
-
+                Logger.error(e)
             }
         }
     }
@@ -144,8 +148,7 @@ function AudioRecorder({
                 setPasue(false)
                 waveForm.current?.startVisualizer()
             } catch (e) {
-                console.log(e);
-
+                Logger.error(e)
             }
         }
     }

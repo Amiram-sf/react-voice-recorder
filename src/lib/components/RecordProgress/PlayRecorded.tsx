@@ -1,5 +1,6 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { ITime } from '../../utils/base-models'
+import { Logger } from '../../utils/logger'
 import { mediaSupported } from '../../utils/media'
 import { WaveForm } from '../../utils/waveform'
 import PauseIcon from '../Icons/PauseIcon'
@@ -28,7 +29,7 @@ function PlayRecorded({
             const drawWave = await WaveForm.setBlob(new Blob(voiceFile, { type: mediaSupported() }))
             drawWave()
         } catch (e) {
-
+            Logger.error(e)
         }
     }
 
@@ -41,7 +42,7 @@ function PlayRecorded({
         }
         reader.readAsDataURL(new Blob(voiceFile, { type: mediaSupported() }))
 
-        if (voiceFile) {
+        if (voiceFile !== undefined && voiceFile.length > 0) {
             drawWaveForm(voiceFile)
         }
     }, [voiceFile])

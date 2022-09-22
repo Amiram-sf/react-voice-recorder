@@ -44,6 +44,7 @@ function App() {
             <AudioRecorder
               onCancel={onCancel}
               onDataAvailable={onDataReady}
+              isLogging
             />
           )
         }
