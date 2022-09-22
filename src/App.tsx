@@ -24,6 +24,12 @@ function App() {
     setAudioSrc("")
   }
 
+  const onPermissionDenied = () => {
+    setIsRecordMode(false)
+    setAudioSrc("")
+    alert("Permission Denied")
+  }
+
   return (
     <div className="App">
       {
@@ -44,6 +50,7 @@ function App() {
             <AudioRecorder
               onCancel={onCancel}
               onDataAvailable={onDataReady}
+              onPermissionDenied={onPermissionDenied}
               isLogging
             />
           )

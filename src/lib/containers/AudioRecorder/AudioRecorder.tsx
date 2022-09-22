@@ -18,13 +18,17 @@ export interface IDataAvailable {
 interface IAudioRecorder {
     onDataAvailable: (value: IDataAvailable) => void
     onCancel: () => void
-    isLogging?: boolean
+    onPermissionDenied: () => void
+    isLogging?: boolean,
+    audioBitsPerSecond?: number
 }
 
 function AudioRecorder({
     onDataAvailable,
     onCancel,
-    isLogging = false
+    onPermissionDenied,
+    isLogging = false,
+    audioBitsPerSecond
 }: IAudioRecorder): ReactElement {
 
     const currentTime = useRef<ITime>({
@@ -55,7 +59,7 @@ function AudioRecorder({
                 },
                 mediaRecorderOptions: {
                     mimeType: mediaSupported(),
-                    audioBitsPerSecond: 3200000
+                    audioBitsPerSecond
                 }
             }
 
@@ -66,6 +70,7 @@ function AudioRecorder({
             setEnableTimer(true)
             startRecording()
         } catch (e) {
+            onPermissionDenied()
             Logger.error(e)
         }
     }
@@ -114,6 +119,7 @@ function AudioRecorder({
             try {
                 mediaRecorder.current?.stop()
                 mediaChunks.current = []
+                waveForm.current?.stopVisualizer()
                 setPasue(true)
                 onCancel()
             } catch (e) {
