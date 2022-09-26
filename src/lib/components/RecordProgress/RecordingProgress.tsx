@@ -6,8 +6,8 @@ import { Wave } from '../Wave/Wave'
 interface IRecordingProgress {
     enableTimer: boolean
     pasue: boolean
-    updateTime: (value: ITime) => void
-    currentTime: ITime
+    updateTime: (value: number) => void
+    currentTime: number
 }
 
 function RecordingProgress({

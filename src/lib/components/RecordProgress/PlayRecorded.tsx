@@ -10,7 +10,7 @@ import { CountDownTimer } from '../Timer/CountDownTimer'
 import { Wave } from '../Wave/Wave'
 
 interface IPlayRecorded {
-    defualtTime: ITime
+    defualtTime: number
     voiceFile?: Blob[]
 }
 
@@ -43,13 +43,14 @@ function PlayRecorded({
         reader.readAsDataURL(new Blob(voiceFile, { type: mediaSupported() }))
 
         if (voiceFile !== undefined && voiceFile.length > 0) {
+
             drawWaveForm(voiceFile)
         }
     }, [voiceFile])
 
     const togglePlayback = () => {
-        setIsPlaying(!isPlaying)
         if (audio.current === null) return
+        setIsPlaying(!isPlaying)
         if (!isPlaying) {
             audio.current.play()
             audio.current.muted = false;

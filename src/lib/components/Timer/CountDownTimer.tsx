@@ -1,9 +1,10 @@
 import { FC, useEffect, useRef, useState } from "react"
 import { ITime } from "../../utils/base-models"
+import { millisecondToTime } from "../../utils/utils"
 
 interface ICountDownTimer {
     pause: boolean
-    defualtTime: ITime
+    defualtTime: number
     onFinish: () => void
 }
 
@@ -14,51 +15,65 @@ export const CountDownTimer: FC<ICountDownTimer> = ({
 }) => {
 
     const timeInterval = useRef<any>(null)
-    const [time, setTime] = useState(defualtTime)
+    const [time, setTime] = useState<ITime>({
+        minute: 0,
+        seconds: 0
+    })
 
-    const onUpdateTime = (defualtTime?: ITime) => {
+    useEffect(() => {
+        const { minute, seconds } = time
+        if (minute === 0 && seconds === 0) {
+            onFinish()
+        }
+    }, [time])
+
+
+    const onUpdateTime = () => {
         setTime((prevData) => {
-            const { seconds, minute } =
-                prevData.minute !== 0 || prevData.seconds !== 0 ?
-                    prevData :
-                    (defualtTime ? defualtTime : prevData);
+            const { seconds, minute } = prevData;
             const secondsTemp = seconds === 0 ? 59 : seconds - 1;
             const minuteTemp = minute === 0 && seconds === 0 ? 0 : (seconds === 0 ? minute - 1 : minute);
             if (secondsTemp === 0 && minute === 0) {
-                onFinish()
                 if (timeInterval.current) {
                     clearInterval(timeInterval.current)
                 }
             }
             return {
                 seconds: secondsTemp,
-                minute: minuteTemp,
+                minute: minuteTemp
             }
         })
     }
 
-    useEffect(() => {
-        if (
-            JSON.stringify(defualtTime) !== JSON.stringify(time) &&
-            pause
-        ) {
-            onUpdateTime(defualtTime)
-        }
-    }, [defualtTime, pause])
+    const startCountDown = () => {
+        return setInterval(onUpdateTime, 1000)
+    }
 
     useEffect(() => {
-        if (!pause) {
-            timeInterval.current = setInterval(onUpdateTime, 1000)
+        const timeTemp = millisecondToTime(defualtTime)
+        setTime({ ...timeTemp })
+
+        if (!pause && defualtTime > 0) {
+
+            if (timeTemp.millisecond > 0) {
+                setTimeout(() => {
+                    timeInterval.current = startCountDown()
+                }, timeTemp.millisecond);
+            } else {
+
+                timeInterval.current = startCountDown()
+            }
+
 
             return () => {
-                return clearInterval(timeInterval.current)
+                if (timeInterval.current)
+                    clearInterval(timeInterval.current)
             }
         }
         if (pause && timeInterval.current) {
             clearInterval(timeInterval.current)
         }
-    }, [pause])
-
+    }, [pause, defualtTime])
 
     const formatTime = (time: number) => {
         if (time < 10) {
@@ -67,8 +82,6 @@ export const CountDownTimer: FC<ICountDownTimer> = ({
             return time;
         }
     }
-
-
 
     return (
         <time className="timer count-down">

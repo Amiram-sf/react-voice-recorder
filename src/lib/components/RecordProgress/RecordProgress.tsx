@@ -8,7 +8,7 @@ interface IRecordingProgress {
     enableTimer: boolean
     pasue: boolean
     voiceFile?: Blob[]
-    onUpdateTime?: (value: ITime) => void
+    onUpdateTime?: (value: number) => void
 }
 
 function RecordProgress({
@@ -18,12 +18,10 @@ function RecordProgress({
     onUpdateTime
 }: IRecordingProgress): ReactElement {
 
-    const currentTime = useRef<ITime>({
-        minute: 0,
-        seconds: 0
-    })
+    const currentTime = useRef<number>(0)
 
-    const updateTime = (value: ITime) => {
+    const updateTime = (value: number) => {
+
         currentTime.current = value
         onUpdateTime?.(value)
     }

@@ -1,63 +1,84 @@
 import { FC, useEffect, useRef, useState } from "react"
 import { ITime } from "../../utils/base-models"
+import { millisecondToTime } from "../../utils/utils"
 
 interface ITimer {
     enable?: boolean
     pause?: boolean
-    defualtTime?: ITime
-    updateTime: (value: ITime) => void
+    defualtTime?: number
+    updateTime: (value: number) => void
 }
 
 export const Timer: FC<ITimer> = ({
     enable = false,
     pause = false,
-    defualtTime,
+    defualtTime = 0,
     updateTime
 }) => {
 
+    const startTimeToRecord = useRef<number>(0)
     const timeInterval = useRef<any>(null)
-    const [time, setTime] = useState({
+    const [time, setTime] = useState<ITime>({
         minute: 0,
         seconds: 0
     })
+
+    const getTime = (startTime: number) => {
+        return new Date().getTime() - startTime;
+    }
 
     const onUpdateTime = (defualtTime?: ITime) => {
         setTime((prevData) => {
             const { seconds, minute } = defualtTime ? defualtTime : prevData;
             const secondsTemp = seconds === 59 ? 0 : seconds + 1;
             const minuteTemp = minute === 59 && seconds === 59 ? 0 : (seconds === 59 ? minute + 1 : minute);
-            updateTime({
+            const timeInMillisecondsTemp = getTime(startTimeToRecord.current)
+            const timeTemp: ITime = {
                 seconds: secondsTemp,
-                minute: minuteTemp,
-            })
-            return {
-                seconds: secondsTemp,
-                minute: minuteTemp,
+                minute: minuteTemp
             }
+            updateTime(timeInMillisecondsTemp)
+            return { ...timeTemp }
         })
     }
 
-    useEffect(() => {
-        if (
-            defualtTime !== undefined &&
-            JSON.stringify(defualtTime) !== JSON.stringify(time)
-        ) {
-            onUpdateTime(defualtTime)
-        }
-    }, [defualtTime])
+    const startTimer = () => {
+        return setInterval(onUpdateTime, 1000)
+    }
 
     useEffect(() => {
         if (enable && !pause) {
-            timeInterval.current = setInterval(onUpdateTime, 1000)
+
+
+            startTimeToRecord.current = new Date().getTime() - defualtTime;
+            if (
+                defualtTime !== undefined &&
+                defualtTime !== 0
+            ) {
+                const timeTemp = millisecondToTime(defualtTime);
+                setTime({
+                    ...timeTemp
+                })
+                setTimeout(() => {
+                    onUpdateTime()
+                    timeInterval.current = startTimer()
+                }, timeTemp.millisecond);
+
+            } else {
+                timeInterval.current = startTimer()
+            }
 
             return () => {
-                return clearInterval(timeInterval.current)
+                const timeInMillisecondsTemp = getTime(startTimeToRecord.current)
+                updateTime(timeInMillisecondsTemp)
+                if (timeInterval.current)
+                    clearInterval(timeInterval.current)
             }
         }
         if ((!enable || pause) && timeInterval.current) {
             clearInterval(timeInterval.current)
         }
-    }, [enable, pause])
+    }, [enable, pause, defualtTime])
 
 
     const formatTime = (time: number) => {
