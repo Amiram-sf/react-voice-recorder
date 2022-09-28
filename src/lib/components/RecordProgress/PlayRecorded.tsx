@@ -1,5 +1,4 @@
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { ITime } from '../../utils/base-models'
 import { Logger } from '../../utils/logger'
 import { mediaSupported } from '../../utils/media'
 import { WaveFormFromBlob } from '../../utils/waveform'

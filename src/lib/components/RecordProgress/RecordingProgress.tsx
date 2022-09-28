@@ -1,5 +1,4 @@
 import { ReactElement } from 'react'
-import { ITime } from '../../utils/base-models'
 import { Timer } from '../Timer/Timer'
 import { Wave } from '../Wave/Wave'
 
