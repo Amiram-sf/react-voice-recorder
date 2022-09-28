@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useRef, useState } from 'react'
 import { ITime } from '../../utils/base-models'
 import { Logger } from '../../utils/logger'
 import { mediaSupported } from '../../utils/media'
-import { WaveForm } from '../../utils/waveform'
+import { WaveFormFromBlob } from '../../utils/waveform'
 import PauseIcon from '../Icons/PauseIcon'
 import PlayIcon from '../Icons/PlayIcon'
 import { IsShow } from '../IsShow/IsShow'
@@ -26,8 +26,12 @@ function PlayRecorded({
 
     const drawWaveForm = async (voiceFile: Blob[]) => {
         try {
-            const drawWave = await WaveForm.setBlob(new Blob(voiceFile, { type: mediaSupported() }))
-            drawWave()
+            const waveFormFromBlob = new WaveFormFromBlob()
+            waveFormFromBlob
+                .setBlobFile(new Blob(voiceFile, { type: mediaSupported() }))
+                .then(_this => {
+                    _this.draw()
+                })
         } catch (e) {
             Logger.error(e)
         }

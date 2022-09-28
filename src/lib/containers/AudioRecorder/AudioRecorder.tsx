@@ -6,7 +6,7 @@ import { TogglePlay } from '../../components/Buttons/TogglePlay/TogglePlay';
 import RecordProgress from '../../components/RecordProgress/RecordProgress';
 import { Logger } from '../../utils/logger';
 import { mediaSupported } from '../../utils/media';
-import { WaveForm } from '../../utils/waveform';
+import { WaveFormFromStream } from '../../utils/waveform';
 import './../../styles/audio-recorder.css';
 
 export interface IDataAvailable {
@@ -33,7 +33,6 @@ function AudioRecorder({
     const currentTime = useRef<number>(0)
     const mediaRecorder = useRef<MediaRecorder | null>(null)
     const sendDataStatus = useRef<'none' | 'send'>('none')
-    const asd = useRef<string>("")
     const mediaChunks = useRef<Blob[]>([])
     const waveForm = useRef<{
         startVisualizer: () => void,
@@ -68,22 +67,25 @@ function AudioRecorder({
                 }
             }
 
-            mediaRecorder.current = await MediaCore(mediaConfig);
-            waveForm.current = WaveForm.setStream(mediaRecorder.current.stream)
+            try {
+                mediaRecorder.current = await MediaCore(mediaConfig);
+
+            } catch (e) {
+                onPermissionDenied()
+                throw e;
+            }
+
+            waveForm.current = new WaveFormFromStream(mediaRecorder.current.stream)
             mediaRecorder.current.addEventListener('dataavailable', onAudioDataAvailable)
             setEnableTimer(true)
-            startRecording()
             waveForm.current.startVisualizer()
+            startRecording()
         } catch (e) {
             Logger.error(e)
-            onPermissionDenied()
         }
     }
 
     useEffect(() => {
-
-        if (asd.current === "sac") return
-        asd.current = "sac"
         if (mediaRecorder.current == null) {
 
             getMediaRecorder()
@@ -109,7 +111,7 @@ function AudioRecorder({
         ) {
             try {
                 mediaChunks.current = []
-                mediaRecorder.current.start(50)
+                mediaRecorder.current.start(100)
                 setPasue(false)
             } catch (e) {
                 Logger.error(e)

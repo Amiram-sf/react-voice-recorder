@@ -51,6 +51,7 @@ export const CountDownTimer: FC<ICountDownTimer> = ({
 
     useEffect(() => {
         const timeTemp = millisecondToTime(defualtTime)
+        
         setTime({ ...timeTemp })
 
         if (!pause && defualtTime > 0) {

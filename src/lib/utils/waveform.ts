@@ -1,148 +1,173 @@
-import { Constants } from './constants';
+import { Constants } from "./constants";
+import { Logger } from "./logger";
 
 
-function waveForm() {
-    const canvasId: string = Constants.canvasId;
-    window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-    const audioContext = new AudioContext();
-    let color = '#969696'
+class BaseWaveForm {
+    public canvasId: string = Constants.canvasId;
+    public color: string = '#969696';
 
-    const el = document.querySelector('.react-voice-recorder')
-    if (el)
-        color = getComputedStyle(el).getPropertyValue('--grey-color')
+    constructor() {
+        window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;
 
-    function setStream(stream: MediaStream) {
-        let pause: boolean = false;
-        const analyser = audioContext.createAnalyser()
-        analyser.fftSize = 256;
-        const mediaStreamSource = audioContext.createMediaStreamSource(stream)
-        mediaStreamSource.connect(analyser)
+        window.requestAnimationFrame = window.requestAnimationFrame || (window as any).mozRequestAnimationFrame ||
+            (window as any).webkitRequestAnimationFrame || (window as any).msRequestAnimationFrame;
 
-        function drawVisualizer() {
-            if (pause) return
+        window.cancelAnimationFrame = window.cancelAnimationFrame || (window as any).mozCancelAnimationFrame;
 
-            requestAnimationFrame(drawVisualizer);
+        const el = document.querySelector('.react-voice-recorder')
+        if (el)
+            this.color = getComputedStyle(el).getPropertyValue('--grey-color')
+    }
 
-            const bufferLength = analyser.frequencyBinCount;
+    public get getAudioContext() {
+        return new AudioContext()
+    }
+}
 
-            const dataArray = new Uint8Array(bufferLength);
+export class WaveFormFromStream extends BaseWaveForm {
 
-            analyser.getByteFrequencyData(dataArray);
+    private requestAnimationFrameID: number | null = null;
+    private audioContext: AudioContext;
+    private analyser: AnalyserNode;
+    private mediaStreamSource: MediaStreamAudioSourceNode;
+    private bufferLength: number;
+    private dataArray: Uint8Array;
 
-            const canvas: HTMLCanvasElement | null = document.querySelector(canvasId)
-            if (canvas === null) return
+    constructor(stream: MediaStream) {
+        super()
 
-            const width = canvas.width;
-            const height = canvas.height;
-            const barWidth = 8;
+        this.audioContext = this.getAudioContext;
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream)
+        this.mediaStreamSource.connect(this.analyser)
+        this.bufferLength = this.analyser.frequencyBinCount;
+        this.dataArray = new Uint8Array(this.bufferLength);
+    }
 
-            const canvasContext = canvas.getContext('2d');
-            if (canvasContext === null) return
+    private drawVisualizer(): void {
 
-            canvasContext.clearRect(0, 0, width, height);
-            let x = 0;
-            dataArray.forEach((item, index, array) => {
-                const heightItem = item / 255 * height;
-                canvasContext.strokeStyle = color;
-                x = x + barWidth;
-                canvasContext.beginPath();
-                canvasContext.lineCap = "round";
-                canvasContext.lineWidth = 5;
-                canvasContext.moveTo(x, (height - heightItem) / 2);
-                canvasContext.lineTo(x, ((height - heightItem) / 2) + heightItem);
-                canvasContext.stroke();
-            })
-        }
+        this.requestAnimationFrameID = null;
 
-        function stopVisualizer() {
-            pause = true;
-        }
+        this.analyser.getByteFrequencyData(this.dataArray);
 
-        function startVisualizer() {
-            pause = false;
-            drawVisualizer()
-        }
+        const canvas: HTMLCanvasElement | null = document.querySelector(this.canvasId)
+        if (canvas === null) return
 
-        return {
-            startVisualizer,
-            stopVisualizer
+        const width = canvas.width;
+        const height = canvas.height;
+        const barWidth = 8;
+
+        const canvasContext = canvas.getContext('2d');
+        if (canvasContext === null) return
+
+        canvasContext.clearRect(0, 0, width, height);
+        let x = 0;
+
+        this.dataArray.forEach((item, index, array) => {
+            const heightItem = item / 255 * height;
+            canvasContext.strokeStyle = this.color;
+            x = x + barWidth;
+            canvasContext.beginPath();
+            canvasContext.lineCap = "round";
+            canvasContext.lineWidth = 5;
+            canvasContext.moveTo(x, (height - heightItem) / 2);
+            canvasContext.lineTo(x, ((height - heightItem) / 2) + heightItem);
+            canvasContext.stroke();
+        })
+
+        this.startVisualizer()
+    }
+
+    public stopVisualizer(): void {
+        if (this.requestAnimationFrameID !== null) {
+            cancelAnimationFrame(this.requestAnimationFrameID)
+            this.requestAnimationFrameID = null;
         }
     }
 
-
-    async function setBlob(data: Blob): Promise<any> {
-        try {
-            const arraybuffer = await data.arrayBuffer()
-            const audioBuffer: AudioBuffer = await audioContext.decodeAudioData(arraybuffer)
-
-            let normalizedData: number[] = normalizeData(filterData(audioBuffer));
-
-            function filterData(audioBuffer: AudioBuffer) {
-                const rawData = audioBuffer.getChannelData(0); // We only need to work with one channel of data
-                const samples = 30; // Number of samples we want to have in our final data set
-                const blockSize = Math.floor(rawData.length / samples); // the number of samples in each subdivision
-                const filteredData = [];
-                for (let i = 0; i < samples; i++) {
-                    let blockStart = blockSize * i; // the location of the first sample in the block
-                    let sum = 0;
-                    for (let j = 0; j < blockSize; j++) {
-                        sum = sum + Math.abs(rawData[blockStart + j]) // find the sum of all the samples in the block
-                    }
-                    filteredData.push(sum / blockSize); // divide the sum by the block size to get the average
-                }
-                return filteredData;
-            }
-
-            function normalizeData(filteredData: number[]) {
-                const multiplier = Math.pow(Math.max(...filteredData), -1);
-                return filteredData.map(n => n * multiplier);
-            }
-
-            function draw() {
-                // Set up the canvas
-                const canvas: HTMLCanvasElement | null = document.querySelector(canvasId);
-                if (canvas === null) return
-
-                const ctx = canvas.getContext("2d");
-                if (ctx === null) return
-
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-                let x = 0
-                for (let i = 0; i < normalizedData.length; i++) {
-                    x += 9.9;
-                    let height = (normalizedData[i] >= 1 ? 0.98 : (normalizedData[i] <= 0 ? 0.02 : normalizedData[i])) * canvas.height;
-
-                    drawLineSegment(ctx, x, height);
-                }
-            };
-
-            function drawLineSegment(canvasContext: CanvasRenderingContext2D, x: number, height: number) {
-                canvasContext.lineWidth = 5;
-
-                canvasContext.strokeStyle = color;
-                canvasContext.beginPath();
-                canvasContext.lineCap = "round";
-
-                canvasContext.moveTo(x, (canvasContext.canvas.height - height) / 2);
-                canvasContext.lineTo(x, ((canvasContext.canvas.height - height) / 2) + height);
-                canvasContext.stroke();
-            };
-
-            return draw
-        } catch (e) {
-            return e
+    public startVisualizer(): void {
+        if (this.requestAnimationFrameID === null) {
+            this.requestAnimationFrameID = requestAnimationFrame(this.drawVisualizer.bind(this))
         }
-    }
 
-
-
-    return {
-        setStream,
-        setBlob
     }
 
 }
 
-const WaveForm = waveForm()
-export { WaveForm }
+export class WaveFormFromBlob extends BaseWaveForm {
+    private audioContext: AudioContext;
+    private arraybuffer: ArrayBuffer | null = null;
+    private audioBuffer: AudioBuffer | null = null;
+    private normalizedData: number[] = [];
+
+    constructor() {
+        super()
+        this.audioContext = this.getAudioContext;
+    }
+
+    public async setBlobFile(file: Blob) {
+        this.arraybuffer = await file.arrayBuffer()
+        this.audioBuffer = await this.audioContext.decodeAudioData(this.arraybuffer)
+        return this
+    }
+
+    public draw() {
+
+        if (this.audioBuffer === null) {
+            Logger.error('First Set Blob File');
+            return;
+        }
+
+        this.normalizedData = this.normalizeData(this.filterData(this.audioBuffer));
+        const canvas: HTMLCanvasElement | null = document.querySelector(this.canvasId);
+        if (canvas === null) return
+
+        const ctx = canvas.getContext("2d");
+        if (ctx === null) return
+
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+        let x = 0
+        for (let i = 0; i < this.normalizedData.length; i++) {
+            x += 9.9;
+            let height = (this.normalizedData[i] >= 1 ? 0.98 : (this.normalizedData[i] <= 0 ? 0.02 : this.normalizedData[i])) * canvas.height;
+
+            this.drawLineSegment(ctx, x, height);
+        }
+    };
+
+    private filterData(audioBuffer: AudioBuffer): number[] {
+        const rawData = audioBuffer.getChannelData(0);
+        const samples = 30;
+        const blockSize = Math.floor(rawData.length / samples);
+        const filteredData = [];
+        for (let i = 0; i < samples; i++) {
+            let blockStart = blockSize * i;
+            let sum = 0;
+            for (let j = 0; j < blockSize; j++) {
+                sum = sum + Math.abs(rawData[blockStart + j])
+            }
+            filteredData.push(sum / blockSize);
+        }
+        return filteredData;
+    }
+
+    private normalizeData(filteredData: number[]): number[] {
+        const multiplier = Math.pow(Math.max(...filteredData), -1);
+        return filteredData.map(n => n * multiplier);
+    }
+
+    private drawLineSegment(canvasContext: CanvasRenderingContext2D, x: number, height: number): void {
+        canvasContext.lineWidth = 5;
+
+        canvasContext.strokeStyle = this.color;
+        canvasContext.beginPath();
+        canvasContext.lineCap = "round";
+
+        canvasContext.moveTo(x, (canvasContext.canvas.height - height) / 2);
+        canvasContext.lineTo(x, ((canvasContext.canvas.height - height) / 2) + height);
+        canvasContext.stroke();
+    };
+
+}
