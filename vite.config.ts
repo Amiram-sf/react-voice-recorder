@@ -12,7 +12,7 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/components/index.ts'),
+      entry: path.resolve(__dirname, 'src/lib/index.ts'),
       name: 'ReactVoiceRecorder',
       formats: ['es', 'umd'],
       fileName: (format) => `main.${format}.js`,
