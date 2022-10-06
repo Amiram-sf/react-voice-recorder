@@ -1,6 +1,6 @@
 {
   "name": "@amirseifi/react-voice-recorder",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -36,7 +36,7 @@
       "import": "./dist/main.es.js",
       "require": "./dist/main.umd.js"
     },
-    "./dist/styles.css": {
+    "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     }
