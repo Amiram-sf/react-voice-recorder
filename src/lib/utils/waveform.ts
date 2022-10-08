@@ -4,7 +4,7 @@ import { Logger } from "./logger";
 
 class BaseWaveForm {
     public canvasId: string = Constants.canvasId;
-    public color: string = '#969696';
+    public color: string = Constants.waveColor;
 
     constructor() {
         window.AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -14,7 +14,7 @@ class BaseWaveForm {
 
         window.cancelAnimationFrame = window.cancelAnimationFrame || (window as any).mozCancelAnimationFrame;
 
-        const el = document.querySelector('.react-voice-recorder')
+        const el = document.querySelector(Constants.reactVoiceRecorderElementId)
         if (el)
             this.color = getComputedStyle(el).getPropertyValue('--grey-color')
     }
@@ -80,6 +80,7 @@ export class WaveFormFromStream extends BaseWaveForm {
     }
 
     public stopVisualizer(): void {
+        
         if (this.requestAnimationFrameID !== null) {
             cancelAnimationFrame(this.requestAnimationFrameID)
             this.requestAnimationFrameID = null;
@@ -106,7 +107,7 @@ export class WaveFormFromBlob extends BaseWaveForm {
         this.audioContext = this.getAudioContext;
     }
 
-    public async setBlobFile(file: Blob) {
+    public async setBlobFile(file: Blob) {    
         this.arraybuffer = await file.arrayBuffer()
         this.audioBuffer = await this.audioContext.decodeAudioData(this.arraybuffer)
         return this

@@ -1,10 +1,13 @@
 {
   "name": "@amirseifi/react-voice-recorder",
-  "version": "0.0.3",
+  "description": "A react package for recording voice",
+  "license": "MIT",
+  "version": "0.0.5",
   "type": "module",
+  "author": "Amiram-sf",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,13 +23,26 @@
     "vite": "^3.0.7",
     "vite-plugin-dts": "^1.4.1"
   },
-  "license": "UNLICENSED",
   "peerDependencies": {
     "react": "^18.2.0 || 18.x",
     "react-dom": "^18.2.0 || 18.x"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Amiram-sf/react-voice-recorder.git"
+  },
+  "homepage": "https://github.com/Amiram-sf/react-voice-recorder.git#readme",
+  "keywords": [
+    "typescript",
+    "recorder",
+    "voice recording",
+    "media recording",
+    "audio recorder",
+    "react voice recorder"
+  ],
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "main": "./dist/main.umd.js",
   "module": "./dist/main.es.js",

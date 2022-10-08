@@ -31,7 +31,7 @@ function AudioRecorder({
 }: IAudioRecorder): ReactElement {
 
     const currentTime = useRef<number>(0)
-    const mediaRecorder = useRef<MediaRecorder | null>(null)
+    const mediaRecorder = useRef<MediaRecorder | null | undefined>()
     const sendDataStatus = useRef<'none' | 'send'>('none')
     const mediaChunks = useRef<Blob[]>([])
     const waveForm = useRef<{
@@ -86,12 +86,17 @@ function AudioRecorder({
     }
 
     useEffect(() => {
-        if (mediaRecorder.current == null) {
+        if (mediaRecorder.current === undefined) {
+            mediaRecorder.current = null
 
             getMediaRecorder()
             return () => {
                 mediaRecorder.current?.removeEventListener('dataavailable', onAudioDataAvailable)
+                mediaRecorder.current = null
             }
+        }
+        return () => {
+            mediaRecorder.current = null
         }
     }, [])
 
