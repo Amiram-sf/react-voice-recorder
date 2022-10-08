@@ -2,7 +2,7 @@
   "name": "@amirseifi/react-voice-recorder",
   "description": "A react package for recording voice",
   "license": "MIT",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "author": "Amiram-sf",
   "scripts": {
