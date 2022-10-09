@@ -13,7 +13,7 @@ export const TogglePlay: FC<ITogglePlay> = ({
     isRecordeing
 }) => {
     return (
-        <button type='button' className='button' onClick={() => {
+        <button type='button' className='button button-toggle' onClick={() => {
             onClick()
         }}>
             <IsShow isShow={isRecordeing}>

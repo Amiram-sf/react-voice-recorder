@@ -20,10 +20,14 @@
     position: relative;
     width: 100%;
     display: grid;
-    grid-template-columns: 32px auto 85px;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    grid-row-gap: 1rem;
     column-gap: 1rem;
     padding: 0.5rem 0;
 }
+
+
 
 #react-voice-recorder .actions {
     cursor: pointer;
@@ -37,13 +41,52 @@
 }
 
 #react-voice-recorder .play-controls,
-#react-voice-recorder .wave-controls,
 #react-voice-recorder .cancel-recorder,
+#react-voice-recorder .wave-controls,
 #react-voice-recorder .wave-controls .recording-progress,
 #react-voice-recorder .wave-controls .play-recorded-voice {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+#react-voice-recorder .wave-controls {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 2;
+}
+
+#react-voice-recorder .play-controls,
+#react-voice-recorder .cancel-recorder {
+    grid-row-start: 2;
+    grid-row-end: 3;
+}
+
+#react-voice-recorder .play-controls {
+    justify-content: flex-end;
+}
+#react-voice-recorder .play-controls .button-toggle {
+    margin-right: 1rem;
+}
+
+
+@media (min-width: 768px) {
+    #react-voice-recorder {
+        grid-template-columns: 32px auto 85px;
+        grid-template-rows: auto;
+    }
+
+    #react-voice-recorder .wave-controls,
+    #react-voice-recorder .play-controls,
+    #react-voice-recorder .cancel-recorder {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    #react-voice-recorder .play-controls .button-toggle {
+        margin: auto;
+    }
 }
 
 #react-voice-recorder .wave-controls .recording-progress,
