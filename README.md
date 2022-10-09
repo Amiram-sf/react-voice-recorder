@@ -3,7 +3,7 @@
 A package for recording voice in react.
 
 **Demo Link:** [react voice recorder](https://react-voice-recorder-website.vercel.app/)
-:fa-exclamation-triangle: **Warning** :fa-exclamation-triangle: This package work in localhost AND secure domain (https).
+:fa-exclamation-triangle: **Warning** :fa-exclamation-triangle: This package work in localhost AND secure domain (HTTPS).
 :fa-exclamation-triangle: **Warning** :fa-exclamation-triangle: You must mount the component when you want to start the record and unMount the component when the record is complete.
 
 
@@ -20,8 +20,8 @@ A package for recording voice in react.
 
 |  Name | Required | Type |Description |
 | ------------ | ------------ | ------------ |  ------------ |
-| isLogging  | false | boolean | Log error while using recorder in develop mode , default : false  |
-| audioBitsPerSecond  | false  | number | Set audioBitsPerSecond for recording voice  |
+| isLogging  | false | boolean | Log error while using the recorder in develop mode , default : false  |
+| audioBitsPerSecond  | false  | number | Set audioBitsPerSecond for the recording of voice  |
 | onPermissionDenied  | true  | function  |Function  |
 | onCancel  | true  | function  |Function  |
 | onDataAvailable  | true  | function  |Function  |
