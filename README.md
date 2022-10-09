@@ -3,7 +3,9 @@
 A package for recording voice in react.
 
 **Demo Link:** [react voice recorder](https://react-voice-recorder-website.vercel.app/)
+
 :warning: **Warning** :warning: This package work in localhost AND secure domain (https).
+
 :warning: **Warning** :warning: You must mount the component when you want to start the record and unMount the component when the record is complete.
 
 
