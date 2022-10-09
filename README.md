@@ -27,7 +27,7 @@ A package for recording voice in react.
 | onDataAvailable  | true  | function  |Function  |
 
 
-** Sample : **
+**Sample :**
 
 
 
