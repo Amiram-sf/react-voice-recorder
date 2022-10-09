@@ -9,8 +9,6 @@ function App() {
   const [audioSrc, setAudioSrc] = useState("")
 
   const onDataReady = (value: IDataAvailable) => {
-    console.log(value);
-    
     const reader = new FileReader()
 
     reader.onload = (event) => {
